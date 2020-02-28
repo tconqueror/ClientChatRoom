@@ -70,6 +70,7 @@ BEGIN_MESSAGE_MAP(CClientChatRoomDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CClientChatRoomDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CClientChatRoomDlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -159,8 +160,80 @@ HCURSOR CClientChatRoomDlg::OnQueryDragIcon()
 }
 
 
+void CClientChatRoomDlg::cnt()
+{
+	if (ip.GetWindowTextLengthW() == 0)
+	{
+		AfxMessageBox(L"You must pass 1 IP address!");
+		return;
+	}
+	CString r_ip;
+	ip.GetWindowTextW(r_ip);
+	CString r_port;
+	if (port.GetWindowTextLengthW() == 0)
+	{
+		AfxMessageBox(L"You must pass 1 port");
+		return;
+	}
+	port.GetWindowTextW(r_port);
+	clc = new ClientConnect(this);
+	clc->Start(r_ip, r_port);
+}
+
+void CClientChatRoomDlg::dcnt()
+{
+	delete(clc);
+}
 
 void CClientChatRoomDlg::OnBnClickedButton1()
 {
-	
+	if (status)
+	{
+		CClientChatRoomDlg::cnt();
+		return;
+	}
+	CClientChatRoomDlg::dcnt();
 }
+
+
+void CClientChatRoomDlg::OnBnClickedButton2()
+{
+	CString s_msg;
+	if (message.GetWindowTextLengthW() == 0)
+		return;
+	message.GetWindowTextW(s_msg);
+	clc->SendData(s_msg);
+}
+
+void CClientChatRoomDlg::SetStatus(bool st)
+{
+	status = st;
+}
+
+bool CClientChatRoomDlg::GetStatus()
+{
+	return status;
+}
+
+void CClientChatRoomDlg::ShowMessage(char* pos)
+{
+	CString* msg = reinterpret_cast<CString*> (pos);
+	CString strline;
+	strline.Format(_T("%s\r\n"), *msg);
+	AppendText(strline);
+}
+
+void CClientChatRoomDlg::ShowMessage(CString cs)
+{
+	CString strline;
+	strline.Format(_T("%s\r\n"), cs);
+	AppendText(strline);
+}
+
+void CClientChatRoomDlg::AppendText(CString msg)
+{
+	int len = room.GetWindowTextLengthW();
+	room.SetSel(len, len);
+	room.ReplaceSel(msg);
+}
+

@@ -3,8 +3,13 @@
 //
 
 #pragma once
-
-
+#pragma comment(lib, "ws2_32.lib")
+//#pragma comment(lib, "ntdll.lib")
+#include <mstcpip.h>
+#include <WinSock2.h>
+#include <ip2string.h>
+#include <comdef.h>
+#include "ClientConnect.h"
 // CClientChatRoomDlg dialog
 class CClientChatRoomDlg : public CDialogEx
 {
@@ -36,6 +41,16 @@ private:
 	CEdit message;
 	CEdit ip;
 	CEdit port;
+	void cnt();
+	void dcnt();
+	bool status = true;
+	void AppendText(CString msg);
 public:
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton2();
+	void SetStatus(bool st);
+	bool GetStatus();
+	void ShowMessage(char* pos);
+	void ShowMessage(CString cs);
+	ClientConnect* clc;
 };
