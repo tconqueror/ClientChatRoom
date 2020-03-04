@@ -69,8 +69,11 @@ BEGIN_MESSAGE_MAP(CClientChatRoomDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDOK, &CClientChatRoomDlg::OnBnClickedOK)
 	ON_BN_CLICKED(IDC_BUTTON1, &CClientChatRoomDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CClientChatRoomDlg::OnBnClickedButton2)
+	
+	//ON_MESSAGE(DM_GETDEFID, OnGetDefId)
 END_MESSAGE_MAP()
 
 
@@ -162,27 +165,15 @@ HCURSOR CClientChatRoomDlg::OnQueryDragIcon()
 
 void CClientChatRoomDlg::cnt()
 {
-	if (ip.GetWindowTextLengthW() == 0)
-	{
-		AfxMessageBox(L"You must pass 1 IP address!");
-		return;
-	}
-	CString r_ip;
-	ip.GetWindowTextW(r_ip);
-	CString r_port;
-	if (port.GetWindowTextLengthW() == 0)
-	{
-		AfxMessageBox(L"You must pass 1 port");
-		return;
-	}
-	port.GetWindowTextW(r_port);
-	clc = new ClientConnect(this);
-	clc->Start(r_ip, r_port);
+	cTh = AfxBeginThread(StaticThreadFunc, this);
 }
 
 void CClientChatRoomDlg::dcnt()
 {
+	//delete(cTh);
 	delete(clc);
+	TerminateThread(cTh->m_hThread, 0);
+
 }
 
 void CClientChatRoomDlg::OnBnClickedButton1()
@@ -203,6 +194,11 @@ void CClientChatRoomDlg::OnBnClickedButton2()
 		return;
 	message.GetWindowTextW(s_msg);
 	clc->SendData(s_msg);
+}
+
+void CClientChatRoomDlg::OnBnClickedOK()
+{
+	OnBnClickedButton2();
 }
 
 void CClientChatRoomDlg::SetStatus(bool st)
@@ -228,6 +224,34 @@ void CClientChatRoomDlg::ShowMessage(CString cs)
 	CString strline;
 	strline.Format(_T("%s\r\n"), cs);
 	AppendText(strline);
+}
+
+UINT CClientChatRoomDlg::ThreadFunc()
+{
+	if (ip.GetWindowTextLengthW() == 0)
+	{
+		AfxMessageBox(L"You must pass 1 IP address!");
+		return 1;
+	}
+	CString r_ip;
+	ip.GetWindowTextW(r_ip);
+	CString r_port;
+	if (port.GetWindowTextLengthW() == 0)
+	{
+		AfxMessageBox(L"You must pass 1 port");
+		return 1;
+	}
+	port.GetWindowTextW(r_port);
+	clc = new ClientConnect(this);
+	clc->Start(r_ip, r_port);
+	return 0;
+}
+
+UINT __cdecl CClientChatRoomDlg::StaticThreadFunc(LPVOID pParam)
+{
+	CClientChatRoomDlg* pYourClass = reinterpret_cast <CClientChatRoomDlg*> (pParam);
+	UINT retCode = pYourClass->ThreadFunc();
+	return retCode;
 }
 
 void CClientChatRoomDlg::AppendText(CString msg)

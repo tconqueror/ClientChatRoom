@@ -55,12 +55,16 @@ void ClientConnect::Start(CString addr, CString port)
 	clientDlg->ShowMessage(L"Connect successfully to " + addr + L":" + port + L"\n");
 	int recv_size = 0;
 	char buf[10000];
-	/*while ((recv_size = recv(s, buf, 9998, 0)) != SOCKET_ERROR)
+	while ((recv_size = recv(s, buf, 9998, 0)) != SOCKET_ERROR)
 	{
 		buf[recv_size] = '\0';
 		buf[recv_size + 1] = '\0';
-		clientDlg->ShowMessage(buf);
-	}*/
+		WCHAR* pwchar=reinterpret_cast<WCHAR*>(buf);
+		CString cstemp(pwchar);
+		clientDlg->ShowMessage(cstemp);
+	}
+	clientDlg->ShowMessage(L"Server stopped");
+	clientDlg->OnBnClickedButton1();
 }
 
 void ClientConnect::SendData(CString msg)

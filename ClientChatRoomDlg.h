@@ -45,12 +45,16 @@ private:
 	void dcnt();
 	bool status = true;
 	void AppendText(CString msg);
+	CWinThread* cTh;	
 public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedOK();
 	void SetStatus(bool st);
 	bool GetStatus();
 	void ShowMessage(char* pos);
 	void ShowMessage(CString cs);
 	ClientConnect* clc;
+	UINT ThreadFunc();
+	static UINT __cdecl StaticThreadFunc(LPVOID pParam);
 };
